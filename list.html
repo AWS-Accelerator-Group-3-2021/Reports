@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <!-- The above 3 meta tags *must* come first in the head; any other head content must come *after* these tags -->
+    <meta name="description" content="">
+    <meta name="author" content="Prakhar Trivedi">
+    <script src="https://unpkg.com/axios/dist/axios.min.js">
+
+    </script>
+</head>
+
+<body>
+    <h1>Recent Reports:</h1>
+    <div id="reportsList">
+        <p>---Start---</p>
+    </div>
+    <script>
+        const currentAuthToken = location.pathname.substring(6)
+        var url = 'https://reports.drakonzai.repl.co/session/' + currentAuthToken + '/list/meta/reports'
+        axios.get(url)
+            .then(function (response) {
+                // handle success, reports given in json format
+                
+            })
+            .catch(function (error) {
+                // handle error
+                document.write('There was an error in fetching the reports. Error: ' + error)
+                console.log(error);
+            })
+    </script>
+</body>
+
+</html>

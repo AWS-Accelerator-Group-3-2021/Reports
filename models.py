@@ -1,4 +1,4 @@
-import random
+import random, uuid
 
 def fileContent(fileName):
     with open(fileName, 'r') as f:
@@ -12,6 +12,7 @@ def generateAuthToken():
     authTokenString += random.choice(letters_lst)
   return authTokenString
 
+accessPasswords = ['prakhar@AWS3!2021', 'yisian@AWS3!2021', 'ved@AWS3!2021', 'benjamin@AWS3!2021', 'john@AWS3!2021']
 
 class Report:
     def __init__(self, reporter_name, add_info, datetime, measurement, address):
@@ -20,6 +21,7 @@ class Report:
         self.datetime = datetime # Date and time the report was made in string format
         self.measurement = measurement # What the measurement of the items was
         self.address = address # Address of the offender in question of the report
+        self.id = str(uuid.uuid5()) # Unique ID of the report
 
     def __str__(self):
         return 'Report by %r' % self.reporter_name
@@ -30,7 +32,8 @@ class Report:
             'add_info': self.add_info,
             'datetime': self.datetime,
             'measurement': self.measurement,
-            'address': self.address
+            'address': self.address,
+            'id': self.id
         }
 
     def convertFromJSON(json):

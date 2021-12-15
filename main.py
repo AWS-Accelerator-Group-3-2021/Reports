@@ -60,6 +60,25 @@ def showData(authToken):
     return "<h1>Invalid auth token. Please obtain a new auth token by making a password check request.</h1>"
   return fileContent('list.html')
 
+@app.route('/newReport', methods=['POST'])
+def newReport():
+  if ('ReportsAccessCode' not in request.headers) or ('Content-Type' not in request.headers):
+    return "ReportsAccessCode header or Content-Type header was not present in request. Request rejected."
+  if request.headers['ReportsAccessCode'] == os.getenv('SERVER_ACCESS_CODE') and request.headers['Content-Type'] == 'application/json':
+    newReportData = request.json['data']
+    if newReportData['id'] in loadedReports:
+      return 'Report already exists! Please use the update report endpoint to update the report.'
+    else:
+      for key in ['id', 'reporter_name', 'add_info', 'datetime', 'measurement', 'address']:
+        if key not in newReportData:
+          return 'Invalid report data. Missing key: {}'.format(key)
+
+      loadedReports[newReportData['id']] = newReportData
+      json.dump(loadedReports, open('reports.txt', 'w'))
+      return 'Report successfully added!'
+  else:
+    return 'Authorisation failed! Incorrect data bank access code or content-type.'
+
 #### START OF META DATA REQUESTS
 
 @app.route('/session/<authToken>/list/meta/report/<reportID>')

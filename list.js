@@ -1,6 +1,7 @@
 var currentAuthToken = location.pathname.split('/')
 currentAuthToken = currentAuthToken[2]
-var url = `http://localhost:8000/session/${currentAuthToken}/list/meta/reportIDs`
+var origin = location.origin
+var url = `${origin}/session/${currentAuthToken}/list/meta/reportIDs`
 console.log(url)
 axios.get(url)
     .then(function (response) {
@@ -16,22 +17,22 @@ axios.get(url)
         } else {
             // With given report ID, fetch the report meta data
             response.data.forEach(reportID => {
-                const metaReportURL = `http://localhost:8000/session/${currentAuthToken}/list/meta/report/${reportID}`
+                const metaReportURL = `${origin}/session/${currentAuthToken}/list/meta/report/${reportID}`
                 axios.get(metaReportURL)
-                    .then(response => {
-                        if (response.statusText == 'OK') {
-                            if (response.data != '<h1>Report not found. Please check the report ID and try again.</h1>') {
+                    .then(response2 => {
+                        if (response2.statusText == 'OK') {
+                            if (response2.data != '<h1>Report not found. Please check the report ID and try again.</h1>') {
                                 // Report meta data successfully received
                                 // Make para elem with report meta data
                                 const para = document.createElement("p");
                                 const hrefElem = document.createElement("A");
-                                hrefElem.href = ""
+                                hrefElem.href = `${origin}/session/${currentAuthToken}/list/report/${reportID}`
                                 hrefElem.target = "_blank"
-                                hrefElem.innerHTML = textFileName
+                                hrefElem.innerHTML = `Measurement: ${response2.data.measurement}, By: ${response2.data.reporter_name}, ID: ${reportID}`
 
                                 para.appendChild(hrefElem);
 
-                                const element = document.getElementById("dataBankFilesList");
+                                const element = document.getElementById("reportsList");
                                 element.appendChild(para);
                             } else {
                                 // invalid/non-existent report ID

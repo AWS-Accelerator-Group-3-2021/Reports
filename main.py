@@ -48,7 +48,7 @@ def passwordAuth():
     else:
       return 'Authorisation failed!'
   else:
-    return 'Authorisation failed! Incorrect data bank access code or content-type.'
+    return 'Authorisation failed! Incorrect reports access code or content-type.'
 
 @app.route('/session/<authToken>/list')
 def showData(authToken):
@@ -77,7 +77,23 @@ def newReport():
       json.dump(loadedReports, open('reports.txt', 'w'))
       return 'Report successfully added!'
   else:
-    return 'Authorisation failed! Incorrect data bank access code or content-type.'
+    return 'Authorisation failed! Incorrect reports access code or content-type.'
+
+@app.route('/updateReport', methods=['POST'])
+def updateReport():
+  if ('ReportsAccessCode' not in request.headers) or ('Content-Type' not in request.headers):
+    return "ReportsAccessCode header or Content-Type header was not present in request. Request rejected."
+  if request.headers['ReportsAccessCode'] == os.getenv('SERVER_ACCESS_CODE') and request.headers['Content-Type'] == 'application/json':
+    newReportData = request.json['data']
+    if newReportData['id'] not in loadedReports:
+      return "No such report exists in server. To make a new report, please use the new report endpoint."
+    else:
+      newReportData.pop('id')
+      loadedReports[newReportData['id']] = newReportData
+      return "Report successfully updated!"
+  else:
+    return 'Authorisation failed! Incorrect reports access code or content-type.'
+    
 
 #### START OF META DATA REQUESTS
 

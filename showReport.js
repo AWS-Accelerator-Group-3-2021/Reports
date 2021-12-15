@@ -12,7 +12,7 @@ axios.get(`${origin}/session/${currentAuthToken}/list/meta/report/${currentRepor
                 document.getElementById('reportAuthorLabel').innerHTML = `Author: ${response.data.reporter_name}`
                 document.getElementById('reportMeasurementLabel').innerHTML = `Measurement: ${response.data.measurement}`
                 document.getElementById('reportAddressLabel').innerHTML = `Address of Report: ${response.data.address}`
-                document.getElementById('reportAddInfoLabel').innerHTML = `Report ID: ${response.data.add_info}`
+                document.getElementById('reportAddInfoLabel').innerHTML = `Additional Information: ${response.data.add_info}`
                 document.getElementById('reportClientInfoLabel').innerHTML = `Client Information: ${response.data.clientInfo}`
                 document.getElementById('reportDatetimeLabel').innerHTML = `Date and time: ${response.data.datetime}`
             } else {

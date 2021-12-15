@@ -8,6 +8,7 @@ app = Flask(__name__)
 CORS(app)
 
 validAuthTokens = json.loads(open('authTokens.txt').read())
+loadedReports = json.loads(open('reports.txt').read())
 
 #### EXAMPLE REPORT:
 #### {
@@ -57,14 +58,21 @@ def getReports(authToken):
       isValid = True
   if not isValid:
     return "<h1>Invalid auth token. Please obtain a new auth token by making a password check request.</h1>"
-  reports = []
-  for report in reports:
-    reports.append(report.convertedToJSON())
+  reports = loadedReports
   return jsonify(reports)
 
-@app.route('/session/<authToken>/list/meta/reports/<reportID>')
+@app.route('/session/<authToken>/list/report/<reportID>')
 def getIndivReport(authToken, reportID):
-  return "hello"
+  isValid = False
+  for timeKey in validAuthTokens:
+    if validAuthTokens[timeKey] == authToken:
+      isValid = True
+  if not isValid:
+    return "<h1>Invalid auth token. Please obtain a new auth token by making a password check request.</h1>"
+  if reportID in loadedReports:
+    return jsonify(loadedReports[reportID])
+  else:
+    return "<h1>Report not found.</h1>"
 
 if __name__ == "__main__":
     app.run(host='0.0.0.0', port=8000)

@@ -16,7 +16,7 @@ def generateAuthToken():
 
 accessPasswords = []
 for name in ['prakhar', 'yisian', 'ved', 'benjamin', 'john']:
-    accessPasswords.append(name + os.getenv('PASS_EXTENSION'))
+    accessPasswords.append(name + os.environ['PASS_EXTENSION'])
 
 class Report:
     def __init__(self, reporter_name, add_info, datetime, measurement, address):

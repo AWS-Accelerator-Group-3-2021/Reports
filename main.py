@@ -38,7 +38,7 @@ def index():
 
 @app.route('/passwordCheck', methods=['POST'])
 def passwordAuth():
-  if request.headers['ReportsAccessCode'] == os.getenv('SERVER_ACCESS_CODE') and request.headers['Content-Type'] == 'application/json':
+  if request.headers['ReportsAccessCode'] == os.environ['SERVER_ACCESS_CODE'] and request.headers['Content-Type'] == 'application/json':
     if request.json['data'] in accessPasswords:
       newToken = generateAuthToken()
       validAuthTokens[datetime.now().strftime('%H:%M:%S')] = newToken
@@ -64,7 +64,7 @@ def showData(authToken):
 def newReport():
   if ('ReportsAccessCode' not in request.headers) or ('Content-Type' not in request.headers):
     return "ReportsAccessCode header or Content-Type header was not present in request. Request rejected."
-  if request.headers['ReportsAccessCode'] == os.getenv('SERVER_ACCESS_CODE') and request.headers['Content-Type'] == 'application/json':
+  if request.headers['ReportsAccessCode'] == os.environ['SERVER_ACCESS_CODE'] and request.headers['Content-Type'] == 'application/json':
     newReportData = request.json['data']
     if newReportData['id'] in loadedReports:
       return 'Report already exists! Please use the update report endpoint to update the report.'
@@ -83,7 +83,7 @@ def newReport():
 def updateReport():
   if ('ReportsAccessCode' not in request.headers) or ('Content-Type' not in request.headers):
     return "ReportsAccessCode header or Content-Type header was not present in request. Request rejected."
-  if request.headers['ReportsAccessCode'] == os.getenv('SERVER_ACCESS_CODE') and request.headers['Content-Type'] == 'application/json':
+  if request.headers['ReportsAccessCode'] == os.environ['SERVER_ACCESS_CODE'] and request.headers['Content-Type'] == 'application/json':
     newReportData = request.json['data']
     if newReportData['id'] not in loadedReports:
       return "No such report exists in server. To make a new report, please use the new report endpoint."
@@ -154,7 +154,7 @@ def showReport():
 # ADMIN COMMANDS
 @app.route('/<adminPass>/clearTokens')
 def clearTokens(adminPass):
-  if adminPass == os.getenv('ADMIN_PASS'):
+  if adminPass == os.environ['ADMIN_PASS']:
     validAuthTokens = {}
     json.dump(validAuthTokens, open('authTokens.txt', 'w'))
     return 'Tokens cleared!'
@@ -164,7 +164,7 @@ def clearTokens(adminPass):
 @app.route('/<adminPass>/clearReports')
 def clearReports(adminPass):
   global loadedReports
-  if adminPass == os.getenv('ADMIN_PASS'):
+  if adminPass == os.environ['ADMIN_PASS']:
     loadedReports = {}
     json.dump(loadedReports, open('reports.txt', 'w'))
     return 'Reports cleared!'
@@ -174,7 +174,7 @@ def clearReports(adminPass):
 @app.route('/<adminPass>/loadDemoReports')
 def loadDemoReports(adminPass):
   global loadedReports
-  if adminPass == os.getenv('ADMIN_PASS'):
+  if adminPass == os.environ['ADMIN_PASS']:
     loadedReports = json.load(open('demo_reports.txt'))
     json.dump(loadedReports, open('reports.txt', 'w'))
     return 'Demo reports loaded!'

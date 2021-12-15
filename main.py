@@ -62,6 +62,8 @@ def showData(authToken):
     return "<h1>Invalid auth token. Please obtain a new auth token by making a password check request.</h1>"
   return fileContent('list.html')
 
+#### START OF META DATA REQUESTS
+
 @app.route('/session/<authToken>/list/meta/report/<reportID>')
 def getReports(authToken, reportID):
   isValid = False
@@ -87,6 +89,8 @@ def getIDs(authToken):
     reportIDs.append(reportID)
   return jsonify(reportIDs)
 
+#### END OF META DATA REQUESTS
+
 @app.route('/session/<authToken>/list/report/<reportID>')
 def getIndivReport(authToken, reportID):
   isValid = False
@@ -96,7 +100,7 @@ def getIndivReport(authToken, reportID):
   if not isValid:
     return "<h1>Invalid auth token. Please obtain a new auth token by making a password check request.</h1>"
   if reportID in loadedReports:
-    return jsonify(loadedReports[reportID])
+    return fileContent('showReport.html')
   else:
     return "<h1>Report not found. Please check the report ID and try again</h1>"
 
@@ -109,6 +113,10 @@ def home():
 @app.route('/assets/list')
 def list():
   return fileContent('list.js')
+
+@app.route('/assets/showReport')
+def showReport():
+  return fileContent('showReport.js')
 
 # ADMIN COMMANDS
 @app.route('/<adminPass>/clearTokens')

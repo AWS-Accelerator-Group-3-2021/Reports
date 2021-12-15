@@ -122,6 +122,7 @@ def clearTokens(adminPass):
 
 @app.route('/<adminPass>/clearReports')
 def clearReports(adminPass):
+  global loadedReports
   if adminPass == os.getenv('ADMIN_PASS'):
     loadedReports = {}
     json.dump(loadedReports, open('reports.txt', 'w'))

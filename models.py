@@ -19,12 +19,13 @@ for name in ['prakhar', 'yisian', 'ved', 'benjamin', 'john']:
     accessPasswords.append(name + os.environ['PASS_EXTENSION'])
 
 class Report:
-    def __init__(self, reporter_name, add_info, datetime, measurement, address):
+    def __init__(self, reporter_name, add_info, datetime, measurement, address, clientInfo):
         self.reporter_name = reporter_name # Name of the person reporting
         self.add_info = add_info # Additional information about the report
         self.datetime = datetime # Date and time the report was made in string format
         self.measurement = measurement # What the measurement of the items was
         self.address = address # Address of the offender in question of the report
+        self.clientInfo = clientInfo # Client info of the device in question of the report, for e.g iPhone 13 Pro Max, iOS 13.3, etc.
         self.id = str(uuid.uuid5()) # Unique ID of the report
 
     def __str__(self):
@@ -37,8 +38,9 @@ class Report:
             'datetime': self.datetime,
             'measurement': self.measurement,
             'address': self.address,
+            'clientInfo': self.clientInfo,
             'id': self.id
         }
 
     def convertFromJSON(givenJSON):
-        return Report(givenJSON['reporter_name'], givenJSON['add_info'], givenJSON['datetime'], givenJSON['measurement'], givenJSON['address'])
+        return Report(givenJSON['reporter_name'], givenJSON['add_info'], givenJSON['datetime'], givenJSON['measurement'], givenJSON['address'], givenJSON['clientInfo'])

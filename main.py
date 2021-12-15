@@ -69,7 +69,7 @@ def newReport():
     if newReportData['id'] in loadedReports:
       return 'Report already exists! Please use the update report endpoint to update the report.'
     else:
-      for key in ['id', 'reporter_name', 'add_info', 'datetime', 'measurement', 'address']:
+      for key in ['id', 'reporter_name', 'add_info', 'datetime', 'measurement', 'address', 'clientInfo']:
         if key not in newReportData:
           return 'Invalid report data. Missing key: {}'.format(key)
 
@@ -88,6 +88,10 @@ def updateReport():
     if newReportData['id'] not in loadedReports:
       return "No such report exists in server. To make a new report, please use the new report endpoint."
     else:
+      for key in ['id', 'reporter_name', 'add_info', 'datetime', 'measurement', 'address', 'clientInfo']:
+        if key not in newReportData:
+          return 'Invalid report data. Missing key: {}'.format(key)
+
       reportID = newReportData.pop('id')
       loadedReports[reportID] = newReportData
       return "Report successfully updated!"

@@ -20,7 +20,7 @@ axios.get(url)
                 const metaReportURL = `${origin}/session/${currentAuthToken}/list/meta/report/${reportID}`
                 axios.get(metaReportURL)
                     .then(response2 => {
-                        if (response2.statusText == 'OK') {
+                        if (response2.status == 200) {
                             if (response2.data != '<h1>Report not found. Please check the report ID and try again.</h1>') {
                                 // Report meta data successfully received
                                 // Make para elem with report meta data

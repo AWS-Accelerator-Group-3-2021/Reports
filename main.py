@@ -39,7 +39,6 @@ def index():
 @app.route('/passwordCheck', methods=['POST'])
 def passwordAuth():
   if request.headers['ReportsAccessCode'] == os.getenv('SERVER_ACCESS_CODE') and request.headers['Content-Type'] == 'application/json':
-    print(request.json['data'])
     if request.json['data'] in accessPasswords:
       newToken = generateAuthToken()
       validAuthTokens[datetime.now().strftime('%H:%M:%S')] = newToken
@@ -54,7 +53,6 @@ def passwordAuth():
 @app.route('/session/<authToken>/list')
 def showData(authToken):
   isValid = False
-  print(validAuthTokens)
   for timeKey in validAuthTokens:
     if validAuthTokens[timeKey] == authToken:
       isValid = True

@@ -88,8 +88,8 @@ def updateReport():
     if newReportData['id'] not in loadedReports:
       return "No such report exists in server. To make a new report, please use the new report endpoint."
     else:
-      newReportData.pop('id')
-      loadedReports[newReportData['id']] = newReportData
+      reportID = newReportData.pop('id')
+      loadedReports[reportID] = newReportData
       return "Report successfully updated!"
   else:
     return 'Authorisation failed! Incorrect reports access code or content-type.'

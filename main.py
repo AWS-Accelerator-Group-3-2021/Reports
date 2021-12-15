@@ -9,6 +9,17 @@ CORS(app)
 
 validAuthTokens = json.loads(open('authTokens.txt').read())
 
+#### EXAMPLE REPORT:
+#### {
+####   "id": "<UUID STRING>" : {
+######   "reporter_name": "<STRING>",
+######   "add_info": "<STRING>",
+######   "datetime": "<DATETIME STRING>",
+######   "measurement": "<FLOAT>",
+######   "address": "<STRING>",
+####   }
+#### }
+
 @app.route('/')
 def index():
     return fileContent('index.html')

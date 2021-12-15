@@ -2,3 +2,4 @@ virt/
 __pycache__/
 authTokens.txt
 reports.txt
+.env

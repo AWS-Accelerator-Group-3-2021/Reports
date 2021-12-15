@@ -1,4 +1,6 @@
-import random, uuid
+import random, uuid, os
+from dotenv import load_dotenv
+load_dotenv()
 
 def fileContent(fileName):
     with open(fileName, 'r') as f:
@@ -12,7 +14,9 @@ def generateAuthToken():
     authTokenString += random.choice(letters_lst)
   return authTokenString
 
-accessPasswords = ['prakhar@AWS3!2021', 'yisian@AWS3!2021', 'ved@AWS3!2021', 'benjamin@AWS3!2021', 'john@AWS3!2021']
+accessPasswords = []
+for name in ['prakhar', 'yisian', 'ved', 'benjamin', 'john']:
+    accessPasswords.append(name + os.getenv('PASS_EXTENSION'))
 
 class Report:
     def __init__(self, reporter_name, add_info, datetime, measurement, address):

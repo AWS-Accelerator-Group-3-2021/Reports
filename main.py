@@ -1,16 +1,24 @@
 from flask import Flask, render_template, request, redirect, url_for, flash, jsonify
 from flask_cors import CORS
 from models import *
-import json
+import json, os
 from datetime import datetime
+from dotenv import load_dotenv
+load_dotenv()
 
 app = Flask(__name__)
 CORS(app)
 
 validAuthTokens = {}
+if not os.path.exists(os.path.join(os.getcwd(), 'authTokens.txt')):
+  with open(os.path.join(os.getcwd(), 'authTokens.txt'), 'w') as f:
+    f.write("{}")
 with open('authTokens.txt', 'r') as f:
   validAuthTokens = json.load(f)
 
+if not os.path.exists(os.path.join(os.getcwd(), 'reports.txt')):
+  with open(os.path.join(os.getcwd(), 'reports.txt'), 'w') as f:
+    f.write("{}")
 loadedReports = json.load(open('reports.txt'))
 
 #### EXAMPLE REPORT:
@@ -30,7 +38,7 @@ def index():
 
 @app.route('/passwordCheck', methods=['POST'])
 def passwordAuth():
-  if request.headers['ReportsAccessCode'] == 'AWSGroup3-POCwej69' and request.headers['Content-Type'] == 'application/json':
+  if request.headers['ReportsAccessCode'] == os.getenv('SERVER_ACCESS_CODE') and request.headers['Content-Type'] == 'application/json':
     print(request.json['data'])
     if request.json['data'] in accessPasswords:
       newToken = generateAuthToken()
@@ -101,6 +109,35 @@ def home():
 @app.route('/assets/list')
 def list():
   return fileContent('list.js')
+
+# ADMIN COMMANDS
+@app.route('/<adminPass>/clearTokens')
+def clearTokens(adminPass):
+  if adminPass == os.getenv('ADMIN_PASS'):
+    validAuthTokens = {}
+    json.dump(validAuthTokens, open('authTokens.txt', 'w'))
+    return 'Tokens cleared!'
+  else:
+    return '<h1>Invalid admin password. Please try again.</h1>'
+
+@app.route('/<adminPass>/clearReports')
+def clearReports(adminPass):
+  if adminPass == os.getenv('ADMIN_PASS'):
+    loadedReports = {}
+    json.dump(loadedReports, open('reports.txt', 'w'))
+    return 'Reports cleared!'
+  else:
+    return '<h1>Invalid admin password. Please try again.</h1>'
+
+@app.route('/<adminPass>/loadDemoReports')
+def loadDemoReports(adminPass):
+  global loadedReports
+  if adminPass == os.getenv('ADMIN_PASS'):
+    loadedReports = json.load(open('demo_reports.txt'))
+    json.dump(loadedReports, open('reports.txt', 'w'))
+    return 'Demo reports loaded!'
+  else:
+    return '<h1>Invalid admin password. Please try again.</h1>'
 
 if __name__ == "__main__":
     app.run(host='0.0.0.0', port=8000)

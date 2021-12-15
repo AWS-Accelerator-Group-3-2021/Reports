@@ -1,7 +1,8 @@
 function checkPassword() {
+    const origin = location.origin
     var pwd = document.getElementById("authkeyfield").value;
   
-    var checkURL = 'http://localhost:8000/passwordCheck'
+    var checkURL = `${origin}/passwordCheck`
   
     axios({
       method: 'post',
@@ -20,7 +21,7 @@ function checkPassword() {
         var tempAuthToken = response.data.substring(43)
         console.log(tempAuthToken)
         setTimeout(() => {
-          document.location = 'http://localhost:8000/session/' + tempAuthToken + '/list'
+          document.location = `${origin}/session/` + tempAuthToken + '/list'
         }, 2000)
       } else {
         document.getElementsByClassName('updateLabel')[0].style.visibility = "hidden"

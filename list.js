@@ -15,7 +15,9 @@ axios.get(url)
             const element = document.getElementById("reportsList");
             element.appendChild(para);
         } else {
-            
+            response.data.forEach((report) => {
+                
+            })
         }
     })
     .catch(function (error) {

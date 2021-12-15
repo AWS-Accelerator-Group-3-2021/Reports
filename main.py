@@ -7,8 +7,11 @@ from datetime import datetime
 app = Flask(__name__)
 CORS(app)
 
-validAuthTokens = json.loads(open('authTokens.txt').read())
-loadedReports = json.loads(open('reports.txt').read())
+validAuthTokens = {}
+with open('authTokens.txt', 'r') as f:
+  validAuthTokens = json.load(f)
+
+loadedReports = json.load(open('reports.txt'))
 
 #### EXAMPLE REPORT:
 #### {
@@ -28,6 +31,7 @@ def index():
 @app.route('/passwordCheck', methods=['POST'])
 def passwordAuth():
   if request.headers['ReportsAccessCode'] == 'AWSGroup3-POCwej69' and request.headers['Content-Type'] == 'application/json':
+    print(request.json['data'])
     if request.json['data'] in accessPasswords:
       newToken = generateAuthToken()
       validAuthTokens[datetime.now().strftime('%H:%M:%S')] = newToken
@@ -73,6 +77,16 @@ def getIndivReport(authToken, reportID):
     return jsonify(loadedReports[reportID])
   else:
     return "<h1>Report not found.</h1>"
+
+
+# ASSET FILES
+@app.route('/assets/home')
+def home():
+  return fileContent('home.js')
+
+@app.route('/assets/list')
+def list():
+  return fileContent('list.js')
 
 if __name__ == "__main__":
     app.run(host='0.0.0.0', port=8000)

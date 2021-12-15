@@ -18,19 +18,7 @@
     <div id="reportsList">
         <p>---Start---</p>
     </div>
-    <script>
-        const currentAuthToken = location.pathname.substring(6)
-        var url = 'https://reports.drakonzai.repl.co/session/' + currentAuthToken + '/list/meta/reports'
-        axios.get(url)
-            .then(function (response) {
-                // handle success, reports given in json format
-                
-            })
-            .catch(function (error) {
-                // handle error
-                document.write('There was an error in fetching the reports. Error: ' + error)
-                console.log(error);
-            })
+    <script src="/assets/list">
     </script>
 </body>
 

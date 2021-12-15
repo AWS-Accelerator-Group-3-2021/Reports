@@ -54,16 +54,30 @@ def showData(authToken):
     return "<h1>Invalid auth token. Please obtain a new auth token by making a password check request.</h1>"
   return fileContent('list.html')
 
-@app.route('/session/<authToken>/list/meta/reports')
-def getReports(authToken):
+@app.route('/session/<authToken>/list/meta/report/<reportID>')
+def getReports(authToken, reportID):
   isValid = False
   for timeKey in validAuthTokens:
     if validAuthTokens[timeKey] == authToken:
       isValid = True
   if not isValid:
     return "<h1>Invalid auth token. Please obtain a new auth token by making a password check request.</h1>"
-  reports = loadedReports
-  return jsonify(reports)
+  if reportID not in loadedReports:
+    return "<h1>Report not found. Please check the report ID and try again.</h1>"
+  return jsonify(loadedReports[reportID])
+
+@app.route('/session/<authToken>/list/meta/reportIDs')
+def getIDs(authToken):
+  isValid = False
+  for timeKey in validAuthTokens:
+    if validAuthTokens[timeKey] == authToken:
+      isValid = True
+  if not isValid:
+    return "<h1>Invalid auth token. Please obtain a new auth token by making a password check request.</h1>"
+  reportIDs = []
+  for reportID in loadedReports:
+    reportIDs.append(reportID)
+  return jsonify(reportIDs)
 
 @app.route('/session/<authToken>/list/report/<reportID>')
 def getIndivReport(authToken, reportID):
@@ -76,7 +90,7 @@ def getIndivReport(authToken, reportID):
   if reportID in loadedReports:
     return jsonify(loadedReports[reportID])
   else:
-    return "<h1>Report not found.</h1>"
+    return "<h1>Report not found. Please check the report ID and try again</h1>"
 
 
 # ASSET FILES

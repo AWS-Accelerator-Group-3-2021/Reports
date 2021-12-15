@@ -36,5 +36,5 @@ class Report:
             'id': self.id
         }
 
-    def convertFromJSON(json):
-        return Report(json['reporter_name'], json['add_info'], json['datetime'], json['measurement'], json['address'])
+    def convertFromJSON(givenJSON):
+        return Report(givenJSON['reporter_name'], givenJSON['add_info'], givenJSON['datetime'], givenJSON['measurement'], givenJSON['address'])

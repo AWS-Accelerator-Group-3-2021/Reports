@@ -203,5 +203,14 @@ def loadDemoReports(adminPass):
   else:
     return '<h1>Invalid admin password. Please try again.</h1>'
 
+# MISCELLANEOUS COMMANDS
+@app.route('/version')
+def version():
+  return """
+  <h1>The Reports System</h1>
+  <h3>Version: {}</h13>
+  <h3>{}</h3>
+  """.format(os.environ['VERSION'], "© 2021 The AWS Accelerator Group 3 2021 Singapore. All rights reserved.")
+
 if __name__ == "__main__":
     app.run(host='0.0.0.0', port=8000)

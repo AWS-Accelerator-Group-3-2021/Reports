@@ -29,6 +29,7 @@ loadedReports = json.load(open('reports.txt'))
 ######   "datetime": "<DATETIME STRING>",
 ######   "measurement": "<FLOAT>",
 ######   "address": "<STRING>",
+######   "clientInfo": "<STRING>"
 ####   }
 #### }
 
@@ -95,6 +96,23 @@ def updateReport():
       reportID = newReportData.pop('id')
       loadedReports[reportID] = newReportData
       return "Report successfully updated!"
+  else:
+    return 'Authorisation failed! Incorrect reports access code or content-type.'
+
+@app.route('/deleteReport', methods=['POST'])
+def deleteReport():
+  if ('ReportsAccessCode' not in request.headers) or ('Content-Type' not in request.headers):
+    return "ReportsAccessCode header or Content-Type header was not present in request. Request rejected."
+  if request.headers['ReportsAccessCode'] == os.environ['SERVER_ACCESS_CODE'] and request.headers['Content-Type'] == 'application/json':
+    if 'id' not in request.json['data']:
+      return "Invalid request. No report ID was provided."
+    reportID = request.json['data']['id']
+    if reportID not in loadedReports:
+      return "No such report exists in server. To make a new report, please use the new report endpoint."
+    else:
+      loadedReports.pop(reportID)
+      json.dump(loadedReports, open('reports.txt', 'w'))
+      return "Report successfully deleted!"
   else:
     return 'Authorisation failed! Incorrect reports access code or content-type.'
     

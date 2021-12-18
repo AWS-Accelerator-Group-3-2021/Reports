@@ -17,7 +17,7 @@ axios.get(`${origin}/session/${currentAuthToken}/list/meta/report/${currentRepor
                 document.getElementById('reportDatetimeLabel').innerHTML = `Date and time: ${response.data.datetime}`
             } else {
                 document.write('There was an error in fetching the report details. This is likely a server error. Please try again.')
-                console.log('Received incorrect report ID response with the incorrect ID being: ' + currentReportID)
+                console.log(`Received incorrect report ID response with the incorrect ID being: ${currentReportID}`)
             }
         } else {
             document.write('There was an error in fetching the report details. This is likely a server error. Please try again.')

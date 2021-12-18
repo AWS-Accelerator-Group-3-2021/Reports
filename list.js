@@ -17,14 +17,27 @@ function compare(a, b) {
     return 0;
 }
 
+function renderReport(report) {
+    // console.log("reached here")
+    const para = document.createElement("p");
+    const hrefElem = document.createElement("A");
+    hrefElem.href = `${origin}/session/${currentAuthToken}/list/report/${report.id}`
+    hrefElem.target = "_blank"
+    hrefElem.innerHTML = `Measurement: ${report.measurement}, By: ${report.reporter_name}, ID: ${report.id}`
+    para.appendChild(hrefElem);
+
+    const element = document.getElementById("reportsList");
+    element.appendChild(para);
+}
+
 // Actual fetching of IDs and reports
 axios.get(url)
-    .then(function (response) {
+    .then(function (idsArray) {
         // handle success
         // Object.keys(response.data).length === 0
         // console.log(response.data)
         // Check if fetched meta report IDs is existent
-        if (response.data.length == 0) {
+        if (idsArray.data.length == 0) {
             const para = document.createElement("p");
             para.innerHTML = "No reports found.";
             const element = document.getElementById("reportsList");
@@ -32,38 +45,26 @@ axios.get(url)
         } else {
             // With given report ID, fetch the report meta data
             var reports = []
-            var loopCount = 0
-            response.data.forEach(reportID => {
+            idsArray.data.forEach(reportID => {
                 const metaReportURL = `${origin}/session/${currentAuthToken}/list/meta/report/${reportID}`
                 axios.get(metaReportURL)
-                    .then(response2 => {
-                        if (response2.status == 200) {
-                            if (response2.data != '<h1>Report not found. Please check the report ID and try again.</h1>') {
+                    .then(metaDataResponse => {
+                        if (metaDataResponse.status == 200) {
+                            if (metaDataResponse.data != '<h1>Report not found. Please check the report ID and try again.</h1>') {
                                 // Report meta data successfully received
                                 // Make para elem with report meta data
-                                const datetimeWithoutGMTText = response2.data.datetime.split(" ")[0]
+                                const datetimeWithoutGMTText = metaDataResponse.data.datetime.split(" ")[0]
 
-                                var newData = response2.data
+                                var newData = metaDataResponse.data
                                 newData.datetimeWithoutGMTText = datetimeWithoutGMTText
                                 newData.id = reportID
 
                                 reports.push(newData)
                                 reports.sort(compare)
-                                console.log(reports.length)
-                                if (loopCount == (response.data.length)) {
-                                    reports.forEach(report => {
-                                        console.log("reached here")
-                                        const para = document.createElement("p");
-                                        const hrefElem = document.createElement("A");
-                                        hrefElem.href = `${origin}/session/${currentAuthToken}/list/report/${report.id}`
-                                        hrefElem.target = "_blank"
-                                        hrefElem.innerHTML = `Measurement: ${report.measurement}, By: ${report.reporter_name}, ID: ${report.id}`
-                                        para.appendChild(hrefElem);
-
-                                        const element = document.getElementById("reportsList");
-                                        element.appendChild(para);
-                                    })
-                                }
+                                document.getElementById('reportsList').innerHTML = ""
+                                reports.forEach(report => {
+                                    renderReport(report)
+                                })
                             } else {
                                 // invalid/non-existent report ID
                                 document.write('There was an error in fetching a report correctly due to an incorrect report ID being received. This is likely a server error. Please try again.')
@@ -79,7 +80,6 @@ axios.get(url)
                         document.write('There was an error in fetching the reports. Error: ' + error)
                         console.log(error);
                     })
-                loopCount += 1
             })
         }
     })

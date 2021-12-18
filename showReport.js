@@ -14,7 +14,9 @@ axios.get(`${origin}/session/${currentAuthToken}/list/meta/report/${currentRepor
                 document.getElementById('reportAddressLabel').innerHTML = `Address of Report: ${response.data.address}`
                 document.getElementById('reportAddInfoLabel').innerHTML = `Additional Information: ${response.data.add_info}`
                 document.getElementById('reportClientInfoLabel').innerHTML = `Client Information: ${response.data.clientInfo}`
-                document.getElementById('reportDatetimeLabel').innerHTML = `Date and time: ${response.data.datetime}`
+
+                var displayDatetime = response.data.datetime.split(' ')[0].split('T').join(' ') + ' GMT'
+                document.getElementById('reportDatetimeLabel').innerHTML = `Date and time: ${displayDatetime}`
             } else {
                 document.write('There was an error in fetching the report details. This is likely a server error. Please try again.')
                 console.log(`Received incorrect report ID response with the incorrect ID being: ${currentReportID}`)

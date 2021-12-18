@@ -9,12 +9,36 @@
     <meta name="description" content="">
     <meta name="author" content="Prakhar Trivedi">
     <script src="https://unpkg.com/axios/dist/axios.min.js">
-
     </script>
+    <style>
+        .fancyButtons:hover {
+            background-color: #000000;
+            color: white;
+            stroke: green;
+            stroke-width: 3px;
+            stroke-dashoffset: 15px;
+        }
+
+        .fancyButtons {
+            border: none;
+            color: white;
+            padding: 10px 10px;
+            text-align: center;
+            text-decoration: none;
+            display: inline-block;
+            font-size: 13px;
+            margin: 4px 2px;
+            transition-duration: 0.5s;
+            cursor: pointer;
+            background-color: darkslategray;
+            border-radius: 10px;
+        }
+    </style>
 </head>
 
 <body>
     <h1>Recent Reports:</h1>
+    <p>Or <button id="gotoButton" onclick="gotoReport()" class="fancyButtons">Go straight to a Report</button></p>
     <p>---Start---</p>
     <div id="reportsList">
     </div>

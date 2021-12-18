@@ -2,7 +2,6 @@ var currentAuthToken = location.pathname.split('/')
 currentAuthToken = currentAuthToken[2]
 var origin = location.origin
 var url = `${origin}/session/${currentAuthToken}/list/meta/reportIDs`
-console.log(url)
 
 //Date compairson function
 function compare(a, b) {
@@ -34,8 +33,6 @@ function renderReport(report) {
 axios.get(url)
     .then(function (idsArray) {
         // handle success
-        // Object.keys(response.data).length === 0
-        // console.log(response.data)
         // Check if fetched meta report IDs is existent
         if (idsArray.data.length == 0) {
             const para = document.createElement("p");
@@ -88,3 +85,8 @@ axios.get(url)
         document.write('There was an error in fetching the reports. Error: ' + error)
         console.log(error);
     })
+
+function gotoReport() {
+    var reportID = prompt("Enter report's ID:")
+    document.location = `${origin}/session/${currentAuthToken}/list/report/${reportID}`
+}

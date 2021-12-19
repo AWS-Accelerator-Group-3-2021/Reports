@@ -3,3 +3,4 @@ __pycache__/
 authTokens.txt
 reports.txt
 .env
+.DS_STORE

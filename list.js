@@ -88,5 +88,8 @@ axios.get(url)
 
 function gotoReport() {
     var reportID = prompt("Enter report's ID:")
+    if (!reportID || reportID == "") {
+        return
+    }
     document.location = `${origin}/session/${currentAuthToken}/list/report/${reportID}`
 }

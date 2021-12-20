@@ -209,6 +209,56 @@ If no report ID is provided in the request body, an error response (still with a
 If The Reports System finds no report with the report ID given in the request, an error response (still with a status code of `200` however) of `No such report exists in server. To make a new report, please use the new report endpoint.`
 
 ### Report Meta Data
+The Reports System consists of two ways that a client can get report data in raw format. Due to the design of the system, there are two sites where a [GET `http` request](https://en.wikipedia.org/wiki/Hypertext_Transfer_Protocol#Request_methods) will allow a client to get report information.
+
+Before attempting to get any information at all, the client will have to get an [auth token](#auth-tokens) using a [`passwordCheck` POST request](#user-authentication).
+
+**If you know the ID of the report you are intending to get information of, skip the section and go to [Accessing Individual Report Data](#accessing-individual-report-data)**
+
+#### Getting Report IDs
+There is a high change your client does not have the IDs of the reports to access them, hence, the client will have to send a GET request to `${origin}/session/<AUTH TOKEN HERE>/list/meta/reportIDs`.
+
+This request does not need to have any headers or body as the authentication is done via the auth token itself. Do note that if the auth token is invalid you will get a HTML error response (still with a status code of `200` however) `<h1>Invalid auth token. Please obtain a new auth token by making a password check request.</h1>`.
+
+A successful request will get an array of report IDs with each element having a string data type as a response.
+
+Here is an example request and response pair:
+
+**Request**
+
+URL: `${origin}/session/exampleAuthToken/list/meta/reportIDs`
+
+**Response**
+
+```
+['report1', 'report2', 'report3']
+```
+
+#### Accessing Individual Report Data
+With an auth token and report ID, you can then directly get all raw JSON data of a report by making a GET request to `${origin}/session/<AUTH TOKEN HERE>/list/meta/report/<REPORT ID HERE>`.
+
+This request does not need to have any headers or body as the authentication is done via the auth token itself. Do note that if the auth token is invalid you will get a HTML error response (still with a status code of `200` however) `<h1>Invalid auth token. Please obtain a new auth token by making a password check request.</h1>`.
+
+The response will be in JSON format and will have all of the parameters in the [report model](#report-model) except for the ID (well, because the client already have it).
+
+Here is an example request and response pair:
+
+**Request**
+
+URL: `${origin}/session/sampleAuthToken/list/meta/report/report2`
+
+**Response (This is pretty-printed)**
+
+```json
+{
+   "reporter_name": "Prakhar Trivedi",
+   "add_info": "One morning, I just felt bad, and thought of reporting some people in the neighbourhood.",
+   "measurement": "2.0m",
+   "address": "Block 69C, Bedok Street 89, Bedok, Singapore, 278544",
+   "datetime": "2021-12-20T08:22:48 GMT",
+   "clientInfo": "iPhone 13 Pro Max, iOS 15.2"
+}
+```
 
 ## Miscellaneous Endpoints
 

@@ -143,8 +143,70 @@ If both headers are not present or have incorrect values, the following response
 If the ID of the report is already present (which should not be the case since its a UUID, ensure you are not intending to actually use the `updateReport` endpoint), a response such as this will be received: `Report already exists! Please use the update report endpoint to update the report.`.
 
 ### Update Report
+In order to update a report, a client can use the `updateReport` endpoint to update a report with a given report ID. The `http` POST request should be sent to `${origin}/updateReport` and should conform to [client authentication requirements](#client-authentication) and also the report must be formatted according to the [Report model](#report-model). In the POST request, the client sends an updated Report with some different parameter values. Upon receiveing the request, The Reports System replaces its current save of the report with the report sent in the request by finding it using the ID given. (The report ID cannot be changed.)
+
+Here is an example of the perfect http POST request to `updateReport`:
+
+URL: `${origin}/updateReport`
+
+Headers:
+```json
+{
+  "Content-Type": "application/json",
+  "ReportsAccessCode": "<REPORTS ACCESS CODE>"
+}
+```
+
+Body:
+```json
+{
+  "data": {
+    "id": "454732AF-6B1C-42AC-A274-9B93CA853994",
+    "reporter_name": "Prakhar Trivedi",
+    "add_info": "One morning, I just felt bad, and thought of reporting some people in the neighbourhood.",
+    "measurement": "2.2m", // this parameter is updated
+    "address": "Block 69C, Bedok Street 89, Bedok, Singapore, 278544",
+    "datetime": "2021-12-20T08:22:48 GMT",
+    "clientInfo": "iPhone 13 Pro Max, iOS 15.2"
+  }
+}
+```
+
+If any one of the parameters are missed in the [report model](#report-model), the request will be rejected and a response like this will be received: `Invalid report data. Missing key: <MISSING KEY>` where `<MISSING KEY>` is the name of the missing parameter, for e.g `address`.
+
+If both headers are not present or have incorrect values, the following responses will be received respectively: `ReportsAccessCode header or Content-Type header was not present in request. Request rejected.` and `Authorisation failed! Incorrect reports access code or content-type.`.
+
+If the report ID given in the request does not exist in the server's records, the request will be rejected and you will receive a response like `No such report exists in server. To make a new report, please use the new report endpoint.`.
 
 ### Delete Report
+This one is rather quite simple. The client can send a `http` POST request to a `deleteReport` endpoint to delete a report with a given ID and The Reports System will permanently delete the report. The request should conform to [client authentication requirements](#client-authentication) and only requires to report ID to delete in the body.
+
+Here is an example of a perfect http POST request to `deleteReport`:
+
+URL: `${origin}/deleteReport`
+
+Headers:
+```json
+{
+  "Content-Type": "application/json",
+  "ReportsAccessCode": "<REPORTS ACCESS CODE HERE>"
+}
+```
+
+Body:
+```json
+{
+  "data": {
+    "id": "454732AF-6B1C-42AC-A274-9B93CA853994"
+  }
+}
+```
+
+If both headers are not present or have incorrect values, the following responses will be received respectively: `ReportsAccessCode header or Content-Type header was not present in request. Request rejected.` and `Authorisation failed! Incorrect reports access code or content-type.`.
+
+If no report ID is provided in the request body, an error response (still with a status code of `200` however) of `Invalid request. No report ID was provided.` will be obtained.
+
+If The Reports System finds no report with the report ID given in the request, an error response (still with a status code of `200` however) of `No such report exists in server. To make a new report, please use the new report endpoint.`
 
 ### Report Meta Data
 

@@ -31,7 +31,9 @@ The datetime model describes how The Reports System accepts the date and time of
 
 Every datetime string should be formatted in this format: `yyyy-MM-dd'T'HH:mm:ss z` (This is the exact format most languages' date formatters use.)
 
-In the format, the `T` in the middle should be joining the date and time and the `z` at the end represents the timezone which must always be in GMT. Any date should be first converted to the GMT timezone and then converted to a string in the format shown below. 
+In the format, the `T` in the middle should be joining the date and time and the `z` at the end represents the timezone which must always be in GMT. Any date should be first converted to the GMT timezone and then converted to a string in the format shown below.
+
+Here is an example of the perfect datetime string: `2021-12-20T8:08:26 GMT`
 
 If the datetime is not in GMT, does not follow the format shown above or isn't in a string data type, your request may be rejected or the reports' datetime will be incorrectly represented.
 
@@ -104,8 +106,41 @@ All POST requests to The Reports System require two headers of `Content-Type` an
 A `ReportsAccessCode` is a form of authentication that The Reports System accepts to ensure that you are a verified client accessing the system. This code can only be gotten by the system admin. If this code is wrong, you are likely to receive an error response as such (still with a status code of `200` however): `Authorisation failed! Incorrect reports access code or content-type.`. In this event, you will have to manually update your code with the correct access code.
 
 ## CRUD Operations
+The Reports System has several endpoints related to performing operations on reports, namely [`newReport`](#new-report), [`updateReport`](#update-report), and [`deleteReport`](#delete-report). These endpoints make up 3 out of the 4 CRUD Operations most storage systems have. Don't know what CRUD is? Refer [here](https://wikipedia.com/wiki/CRUD)
 
 ### New Report
+In order to make a new report, a client has to make a POST request that conform to [client authentication requirements](#client-authentication) and the body of the request must follow the [report model](#report-model).
+
+Here is an example of the perfect new report POST `http` request:
+
+URL: `${origin}/newReport`
+Headers:
+```json
+{
+  "Content-Type": "application/json",
+  "ReportsAccessCode": "<REPORTS ACCESS CODE HERE>"
+}
+```
+Body:
+```json
+{
+  "data": {
+    "id": "454732AF-6B1C-42AC-A274-9B93CA853994",
+    "reporter_name": "Prakhar Trivedi",
+    "add_info": "One morning, I just felt bad, and thought of reporting some people in the neighbourhood.",
+    "measurement": "2.0m",
+    "address": "Block 69C, Bedok Street 89, Bedok, Singapore, 278544",
+    "datetime": "2021-12-20T08:22:48 GMT",
+    "clientInfo": "iPhone 13 Pro Max, iOS 15.2"
+  }
+}
+```
+
+If any one of the parameters are missed in the [report model](#report-model), the request will be rejected and a response like this will be received: `Invalid report data. Missing key: <MISSING KEY>` where `<MISSING KEY>` is the name of the missing parameter, for e.g `address`.
+
+If both headers are not present or have incorrect values, the following responses will be received respectively: `ReportsAccessCode header or Content-Type header was not present in request. Request rejected.` and `Authorisation failed! Incorrect reports access code or content-type.`.
+
+If the ID of the report is already present (which should not be the case since its a UUID, ensure you are not intending to actually use the `updateReport` endpoint), a response such as this will be received: `Report already exists! Please use the update report endpoint to update the report.`.
 
 ### Update Report
 

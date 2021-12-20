@@ -47,7 +47,7 @@ Behind the scenes, with the entered password, a `passwordCheck` POST `http` requ
 If the password is valid, the server will respond with a successful message of `Authorisation successful! Temp auth token: <AUTH TOKEN HERE>` where `<AUTH TOKEN HERE>` will be replaced by a randomly generated temporary auth token that the user can use to authenticate and access the server's resources.
 > More about auth tokens [here](#auth-tokens)
 
-If not, the system will respond with an error message (still with a response status code of `200` however) saying `Authorisation failed!`. In this event, is recommended to show an error message to the user and tell them to re-enter their password.
+If not, the system will respond with an error message (still with a response status code of `200` however) saying `Authorisation failed!`. In this event, it is recommended to show an error message to the user and tell them to re-enter their password.
 
 The post request should be made to `${origin}/passwordCheck` where `${origin}` is the home URL of where the server is hosted.
 

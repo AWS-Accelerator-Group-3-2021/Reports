@@ -213,7 +213,8 @@ The Reports System consists of two ways that a client can get report data in raw
 
 Before attempting to get any information at all, the client will have to get an [auth token](#auth-tokens) using a [`passwordCheck` POST request](#user-authentication).
 
-**If you know the ID of the report you are intending to get information of, skip the section and go to [Accessing Individual Report Data](#accessing-individual-report-data)**
+---
+**If you know the ID of the report you are intending to get information of, skip the section below and go to [Accessing Individual Report Data](#accessing-individual-report-data)**
 
 #### Getting Report IDs
 There is a high change your client does not have the IDs of the reports to access them, hence, the client will have to send a GET request to `${origin}/session/<AUTH TOKEN HERE>/list/meta/reportIDs`.

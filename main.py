@@ -176,6 +176,7 @@ def showReport():
 # ADMIN COMMANDS
 @app.route('/<adminPass>/clearTokens')
 def clearTokens(adminPass):
+  global validAuthTokens
   if adminPass == os.environ['ADMIN_PASS']:
     validAuthTokens = {}
     json.dump(validAuthTokens, open('authTokens.txt', 'w'))
@@ -211,6 +212,10 @@ def version():
   <h3>Version: {}</h13>
   <h3>{}</h3>
   """.format(os.environ['VERSION'], "© 2021 The AWS Accelerator Group 3 2021 Singapore. All rights reserved.")
+
+@app.route('/ping')
+def ping():
+  return "Pong! Version: {}".format(os.environ['VERSION'])
 
 if __name__ == "__main__":
     app.run(host='0.0.0.0', port=8000)

@@ -262,5 +262,50 @@ URL: `${origin}/session/sampleAuthToken/list/meta/report/report2`
 ```
 
 ## Miscellaneous Endpoints
+These endpoints are not so much for managing reports or anything but more for just getting information on The Reports System, checking whether its online or not, checking which version of the system its running, etc.
+
+There's two main endpoints that give show how the system is doing; one has more UI and is displayed typically to the user and the other has just plain old text.
+
+### Version Endpoint
+This is basically a HTML webpage to display the current running version of the system. It also shows the title as well as the system copyright. This webpage is probably good for redirecting users to a friendly looking webpage which shows the version.
+
+This webpage is displayed when a GET request is made to `${origin}/version`.
+![HTML Webpage](/assets/version-endpoint.png)
+
+Since it is HTML, its not really convenient for a client to get just the current version of the system, hence, the [ping endpoint](#ping-endpoint) was made.
+
+### Ping Endpoint
+This endpoint gives a simple text response. Its meant for clients to easily identify whether the system is online or not.
+
+A simple GET request with no body or headers just like the [version endpoint](#version-endpoint) to `${origin}/ping` would give a response like such, if the system is even online: `Pong! Version: 1.0`.
+
+The client can substring this text to get the version number or use it otherwise.
 
 ## URL Map
+Below is the entire URL map of The Reports System. (`${origin}` is the URL where the system is hosted.)
+```
+${origin}
+         /newReport (POST)
+         /updateReport (POST)
+         /deleteReport (POST)
+         /version (GET)
+         /ping (GET)
+         /<ADMIN PASS>
+                       /clearReports (GET)
+                       /clearTokens (GET)
+                       /loadDemoReports (GET)
+         /passwordCheck (POST)
+         /session
+                  /<AUTH TOKEN>
+                                /list (GET)
+                                      /meta
+                                            /reportIDs (GET)
+                                            /report
+                                                    /<REPORT ID> (GET)
+                                      /report
+                                              /<REPORT ID> (GET)
+```
+
+This is the end of The Reports System wiki.
+
+© 2021 The Combustifier Team. All rights reserved.

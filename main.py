@@ -10,15 +10,30 @@ app = Flask(__name__)
 CORS(app)
 
 validAuthTokens = {}
+loadedReports = {}
+
+## Make auth tokens file if it doesnt exist
 if not os.path.exists(os.path.join(os.getcwd(), 'authTokens.txt')):
   with open(os.path.join(os.getcwd(), 'authTokens.txt'), 'w') as f:
     f.write("{}")
+
 with open('authTokens.txt', 'r') as f:
   validAuthTokens = json.load(f)
 
+def expireAuthTokens():
+  global validAuthTokens
+  for timeCreated in list(validAuthTokens):
+    # Print out size of validAuthTokens
+    timeCreatedDateObj = datetime.strptime(timeCreated, '%Y-%m-%d %H:%M:%S.%f')
+    if (datetime.now() - timeCreatedDateObj).total_seconds() > 86400:
+      del validAuthTokens[timeCreated]
+      json.dump(validAuthTokens, open('authTokens.txt', 'w'))
+
+## Make reports file if it doesnt exist
 if not os.path.exists(os.path.join(os.getcwd(), 'reports.txt')):
   with open(os.path.join(os.getcwd(), 'reports.txt'), 'w') as f:
     f.write("{}")
+
 loadedReports = json.load(open('reports.txt'))
 
 #### EXAMPLE REPORT:
@@ -42,7 +57,7 @@ def passwordAuth():
   if request.headers['ReportsAccessCode'] == os.environ['SERVER_ACCESS_CODE'] and request.headers['Content-Type'] == 'application/json':
     if request.json['data'] in accessPasswords:
       newToken = generateAuthToken()
-      validAuthTokens[datetime.now().strftime('%H:%M:%S')] = newToken
+      validAuthTokens[datetime.now().strftime("%Y-%m-%d %H:%M:%S.%f")] = newToken
       json.dump(validAuthTokens, open('authTokens.txt', 'w'))
       # print(validAuthTokens)
       return 'Authorisation successful! Temp auth token: {}'.format(newToken)
@@ -53,6 +68,7 @@ def passwordAuth():
 
 @app.route('/session/<authToken>/list')
 def showData(authToken):
+  expireAuthTokens()
   isValid = False
   for timeKey in validAuthTokens:
     if validAuthTokens[timeKey] == authToken:
@@ -121,6 +137,7 @@ def deleteReport():
 
 @app.route('/session/<authToken>/list/meta/report/<reportID>')
 def getReports(authToken, reportID):
+  expireAuthTokens()
   isValid = False
   for timeKey in validAuthTokens:
     if validAuthTokens[timeKey] == authToken:
@@ -133,6 +150,7 @@ def getReports(authToken, reportID):
 
 @app.route('/session/<authToken>/list/meta/reportIDs')
 def getIDs(authToken):
+  expireAuthTokens()
   isValid = False
   for timeKey in validAuthTokens:
     if validAuthTokens[timeKey] == authToken:
@@ -148,6 +166,7 @@ def getIDs(authToken):
 
 @app.route('/session/<authToken>/list/report/<reportID>')
 def getIndivReport(authToken, reportID):
+  expireAuthTokens()
   isValid = False
   for timeKey in validAuthTokens:
     if validAuthTokens[timeKey] == authToken:
@@ -166,7 +185,7 @@ def home():
   return fileContent('home.js')
 
 @app.route('/assets/list')
-def list():
+def listJS():
   return fileContent('list.js')
 
 @app.route('/assets/showReport')
@@ -201,6 +220,31 @@ def loadDemoReports(adminPass):
     loadedReports = json.load(open('demo_reports.txt'))
     json.dump(loadedReports, open('reports.txt', 'w'))
     return 'Demo reports loaded!'
+  else:
+    return '<h1>Invalid admin password. Please try again.</h1>'
+
+@app.route('/<adminPass>/reloadDataFiles')
+def reloadDataFiles(adminPass):
+  global loadedReports
+  global validAuthTokens
+  if adminPass == os.environ['ADMIN_PASS']:
+    try:
+      loadedReports = json.load(open('reports.txt'))
+      validAuthTokens = json.load(open('authTokens.txt'))
+    except:
+      # Create reports file
+      if not os.path.exists(os.path.join(os.getcwd(), 'reports.txt')):
+        with open(os.path.join(os.getcwd(), 'reports.txt'), 'w') as f:
+          f.write("{}")
+
+      # Create auth tokens file
+      if not os.path.exists(os.path.join(os.getcwd(), 'authTokens.txt')):
+        with open(os.path.join(os.getcwd(), 'authTokens.txt'), 'w') as f:
+          f.write("{}")
+
+      loadedReports = json.load(open('reports.txt'))
+      validAuthTokens = json.load(open('authTokens.txt'))
+    return 'Data files reloaded!'
   else:
     return '<h1>Invalid admin password. Please try again.</h1>'
 

@@ -255,7 +255,7 @@ def version():
   <h1>The Reports System</h1>
   <h3>Version: {}</h13>
   <h3>{}</h3>
-  """.format(os.environ['VERSION'], "© 2021 The AWS Accelerator Group 3 2021 Singapore. All rights reserved.")
+  """.format(os.environ['VERSION'], "© 2021 The Combustifier Team. All rights reserved.")
 
 @app.route('/ping')
 def ping():

@@ -23,7 +23,61 @@ function renderReport(report) {
     hrefElem.href = `${origin}/session/${currentAuthToken}/list/report/${report.id}`
     hrefElem.target = "_blank"
     hrefElem.innerHTML = `Measurement: ${report.measurement}, By: ${report.reporter_name}, ID: ${report.id}`
+
+    // Add delete report button to para element
+    const deleteButton = document.createElement("button")
+    deleteButton.innerHTML = "Delete"
+    deleteButton.onclick = function () {
+        alert(`Are you sure you want to delete report ${report.id}?`)
+        var url = `${origin}/deleteReport`
+        var data = {
+            "data": {
+                "id": report.id
+            }
+        }
+        var headers = {
+            "Content-Type": "application/json",
+            "ReportsAccessCode": "AWSGroup3-POCwej69"
+        }
+        axios({
+            method: 'post',
+            url: url,
+            data: data,
+            headers: headers
+        })
+        .then(response => {
+            if (response.status == 200) {
+                if (response.data == "Report deleted successfully!") {
+                    if (!alert("Report deleted successfully!")) {
+                        window.location.reload()
+                    }
+                } else {
+                    if (response.data == "No such report exists in server. To make a new report, please use the new report endpoint.") {
+                        alert("Failed to delete report as no such report was found in server.")
+                        console.log(response.data)
+                    } else {
+                        alert(response.data)
+                        console.log(response.data)
+                    }
+                }
+            } else {
+                alert("Error in connecting to The Reports System. Please try again.")
+                console.log("Non-200 status code returned from deleteReport endpoint.")
+            }
+        })
+        .catch(err => {
+            console.log("Error in deleteing report: " + err)
+            alert("There was an error in deleteing the report: " + err)
+        })
+    }
+    deleteButton.className = "deleteButtons"
+    // Add spacing to deleteButton on the left
+    const deleteSpacing = document.createElement("span")
+    deleteSpacing.innerHTML = "&nbsp;&nbsp;&nbsp;&nbsp;"
+
     para.appendChild(hrefElem);
+    para.appendChild(deleteSpacing)
+    para.appendChild(deleteButton);
 
     const element = document.getElementById("reportsList");
     element.appendChild(para);

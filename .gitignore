@@ -4,3 +4,4 @@ authTokens.txt
 reports.txt
 .env
 .DS_STORE
+config.txt

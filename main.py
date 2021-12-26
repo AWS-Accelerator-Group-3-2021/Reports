@@ -11,6 +11,8 @@ CORS(app)
 
 validAuthTokens = {}
 loadedReports = {}
+settings = {}
+settings = safelyLoadSettings()
 
 ## Make auth tokens file if it doesnt exist
 if not os.path.exists(os.path.join(os.getcwd(), 'authTokens.txt')):
@@ -25,7 +27,7 @@ def expireAuthTokens():
   for timeCreated in list(validAuthTokens):
     # Print out size of validAuthTokens
     timeCreatedDateObj = datetime.strptime(timeCreated, '%Y-%m-%d %H:%M:%S.%f')
-    if (datetime.now() - timeCreatedDateObj).total_seconds() > 86400:
+    if (datetime.now() - timeCreatedDateObj).total_seconds() > int(settings["settings"]["authTokenExpirationTime"]):
       del validAuthTokens[timeCreated]
       json.dump(validAuthTokens, open('authTokens.txt', 'w'))
 
@@ -56,6 +58,8 @@ def index():
 def passwordAuth():
   if request.headers['ReportsAccessCode'] == os.environ['SERVER_ACCESS_CODE'] and request.headers['Content-Type'] == 'application/json':
     if request.json['data'] in accessPasswords:
+      if settings['settings']["loginAlertsEnabled"] == "true":
+        sendLoginAlertDiscordWebhookMessage(request.json['data'])
       newToken = generateAuthToken()
       validAuthTokens[datetime.now().strftime("%Y-%m-%d %H:%M:%S.%f")] = newToken
       json.dump(validAuthTokens, open('authTokens.txt', 'w'))
@@ -81,15 +85,21 @@ def showData(authToken):
 def newReport():
   if ('ReportsAccessCode' not in request.headers) or ('Content-Type' not in request.headers):
     return "ReportsAccessCode header or Content-Type header was not present in request. Request rejected."
+
   if request.headers['ReportsAccessCode'] == os.environ['SERVER_ACCESS_CODE'] and request.headers['Content-Type'] == 'application/json':
+    
+    if 'data' not in request.json:
+      return "No data field in request. Request rejected."
+
     newReportData = request.json['data']
+
+    for key in ['id', 'reporter_name', 'add_info', 'datetime', 'measurement', 'address', 'clientInfo']:
+      if key not in newReportData:
+        return 'Invalid report data. Missing key: {}'.format(key)
+
     if newReportData['id'] in loadedReports:
       return 'Report already exists! Please use the update report endpoint to update the report.'
     else:
-      for key in ['id', 'reporter_name', 'add_info', 'datetime', 'measurement', 'address', 'clientInfo']:
-        if key not in newReportData:
-          return 'Invalid report data. Missing key: {}'.format(key)
-
       loadedReports[newReportData['id']] = newReportData
       json.dump(loadedReports, open('reports.txt', 'w'))
       return 'Report successfully added!'
@@ -100,15 +110,21 @@ def newReport():
 def updateReport():
   if ('ReportsAccessCode' not in request.headers) or ('Content-Type' not in request.headers):
     return "ReportsAccessCode header or Content-Type header was not present in request. Request rejected."
+  
   if request.headers['ReportsAccessCode'] == os.environ['SERVER_ACCESS_CODE'] and request.headers['Content-Type'] == 'application/json':
+    
+    if 'data' not in request.json:
+      return "No data field in request. Request rejected."
+    
     newReportData = request.json['data']
-    if newReportData['id'] not in loadedReports:
-      return "No such report exists in server. To make a new report, please use the new report endpoint."
-    else:
-      for key in ['id', 'reporter_name', 'add_info', 'datetime', 'measurement', 'address', 'clientInfo']:
+
+    for key in ['id', 'reporter_name', 'add_info', 'datetime', 'measurement', 'address', 'clientInfo']:
         if key not in newReportData:
           return 'Invalid report data. Missing key: {}'.format(key)
 
+    if newReportData['id'] not in loadedReports:
+      return "No such report exists in server. To make a new report, please use the new report endpoint."
+    else:
       reportID = newReportData.pop('id')
       loadedReports[reportID] = newReportData
       return "Report successfully updated!"
@@ -120,9 +136,15 @@ def deleteReport():
   if ('ReportsAccessCode' not in request.headers) or ('Content-Type' not in request.headers):
     return "ReportsAccessCode header or Content-Type header was not present in request. Request rejected."
   if request.headers['ReportsAccessCode'] == os.environ['SERVER_ACCESS_CODE'] and request.headers['Content-Type'] == 'application/json':
+    
+    if 'data' not in request.json:
+      return "No data field in request. Request rejected."
+
     if 'id' not in request.json['data']:
       return "Invalid request. No report ID was provided."
+    
     reportID = request.json['data']['id']
+    
     if reportID not in loadedReports:
       return "No such report exists in server. To make a new report, please use the new report endpoint."
     else:
@@ -227,10 +249,12 @@ def loadDemoReports(adminPass):
 def reloadDataFiles(adminPass):
   global loadedReports
   global validAuthTokens
+  global settings
   if adminPass == os.environ['ADMIN_PASS']:
     try:
       loadedReports = json.load(open('reports.txt'))
       validAuthTokens = json.load(open('authTokens.txt'))
+      settings = safelyLoadSettings()
     except:
       # Create reports file
       if not os.path.exists(os.path.join(os.getcwd(), 'reports.txt')):
@@ -242,9 +266,48 @@ def reloadDataFiles(adminPass):
         with open(os.path.join(os.getcwd(), 'authTokens.txt'), 'w') as f:
           f.write("{}")
 
+      settings = safelyLoadSettings()
+
       loadedReports = json.load(open('reports.txt'))
       validAuthTokens = json.load(open('authTokens.txt'))
     return 'Data files reloaded!'
+  else:
+    return '<h1>Invalid admin password. Please try again.</h1>'
+
+@app.route('/<adminPass>/updateSettings', methods=['POST'])
+def updateSettings(adminPass):
+  global settings
+  if adminPass == os.environ['ADMIN_PASS']:
+    if 'data' not in request.json:
+      return "No data field was present in the request. Request rejected.", 400
+    
+    if 'settings' not in request.json['data']:
+      return "No settings field was present in the request. Request rejected.", 400
+    for setting in settingsAvailable:
+      if setting not in request.json['data']['settings']:
+        return "Missing setting: " + setting + ". Request rejected.", 400
+    
+    settings = request.json['data']
+    json.dump(settings, open('config.txt', 'w'))
+    return "Settings updated successfully!"
+
+@app.route('/<adminPass>/loadDefaultSettings')
+def loadDefaultSettings(adminPass):
+  global settings
+  if adminPass == os.environ['ADMIN_PASS']:
+    settings = {
+      "settings": {
+        "loginAlertsEnabled": "true",
+        "authTokenExpirationTime": "86400"
+      }
+    }
+    
+    if not os.path.exists(os.path.join(os.getcwd(), 'config.txt')):
+      with open(os.path.join(os.getcwd(), 'config.txt'), 'w') as f:
+        f.write("{}")
+  
+    json.dump(settings, open('config.txt', 'w'))
+    return "Settings loaded successfully!"
   else:
     return '<h1>Invalid admin password. Please try again.</h1>'
 
@@ -253,7 +316,7 @@ def reloadDataFiles(adminPass):
 def version():
   return """
   <h1>The Reports System</h1>
-  <h3>Version: {}</h13>
+  <h3>Version: {}</h3>
   <h3>{}</h3>
   """.format(os.environ['VERSION'], "© 2021 The Combustifier Team. All rights reserved.")
 
@@ -262,4 +325,8 @@ def ping():
   return "Pong! Version: {}".format(os.environ['VERSION'])
 
 if __name__ == "__main__":
-    app.run(host='0.0.0.0', port=8000)
+  for envVariable in ['ADMIN_PASS', 'PASS_EXTENSION', 'SERVER_ACCESS_CODE', 'VERSION', 'DISCORD_WEBHOOK_URL']:
+    if envVariable not in os.environ:
+      print("System boot error: Missing environment variable: " + envVariable)
+      exit(1)
+  app.run(host='0.0.0.0', port=8000)

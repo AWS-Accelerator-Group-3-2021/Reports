@@ -1,4 +1,5 @@
-import random, uuid, os
+import random, uuid, os, datetime, json
+import requests
 from dotenv import load_dotenv
 load_dotenv()
 
@@ -13,6 +14,62 @@ def generateAuthToken():
   while len(authTokenString) < 10:
     authTokenString += random.choice(letters_lst)
   return authTokenString
+
+def sendLoginAlertDiscordWebhookMessage(pwd):
+    now = datetime.datetime.now()
+    now_str = now.strftime("%Y-%m-%d %H:%M:%S")
+
+    username = pwd.split('@')[0]
+
+    webhook_url = os.environ['DISCORD_WEBHOOK_URL']
+    webhook_data = {
+        "username": "The Reports System",
+        "embeds": [
+            {
+                "title": "Login Alert",
+                "description": "User `{}` has logged into the system with their password.".format(username),
+                "color": 16777215,
+                "footer": {
+                    "text": "This notification was sent to you by The Reports System." + " | " + now_str
+                }
+            }
+        ]
+    }
+    result = requests.post(webhook_url, json=webhook_data)
+
+    try:
+        result.raise_for_status()
+        print()
+        print("Successfully sent login alert to Discord.")
+        print()
+    except requests.exceptions.HTTPError as err:
+        print("Error sending login alert to Discord webhook: " + err)
+
+settingsAvailable = ['loginAlertsEnabled', 'authTokenExpirationTime']
+
+def safelyLoadSettings():
+    ## Make settings file if it doesnt exist
+      if not os.path.exists(os.path.join(os.getcwd(), 'config.txt')):
+        with open(os.path.join(os.getcwd(), 'config.txt'), 'w') as f:
+          f.write("{}")
+
+      settings = json.load(open('config.txt', 'r'))
+      
+      if 'settings' not in settings:
+        settings['settings'] = {}
+        settings['settings']['loginAlertsEnabled'] = 'true'
+        settings['settings']['authTokenExpirationTime'] = '86400'
+        json.dump(settings, open('config.txt', 'w'))
+
+      for setting in settingsAvailable:
+        if setting not in settings['settings']:
+          if setting == 'loginAlertsEnabled':
+            settings['settings'][setting] = 'true'
+          elif setting == 'authTokenExpirationTime':
+            settings['settings'][setting] = '86400'
+          json.dump(settings, open('config.txt', 'w'))
+
+        return settings
 
 accessPasswords = []
 for name in ['prakhar', 'yisian', 'ved', 'benjamin', 'john']:

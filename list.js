@@ -23,6 +23,8 @@ function renderReport(report) {
     hrefElem.href = `${origin}/session/${currentAuthToken}/list/report/${report.id}`
     hrefElem.target = "_blank"
     hrefElem.innerHTML = `Measurement: ${report.measurement}, By: ${report.reporter_name}, ID: ${report.id}`
+    // Change text colour to red
+    para.style.color = "red"
 
     // Add delete report button to para element
     const deleteButton = document.createElement("button")

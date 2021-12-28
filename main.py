@@ -1,6 +1,7 @@
 from flask import Flask, render_template, request, redirect, url_for, flash, jsonify
 from flask_cors import CORS
 from models import *
+from logger import *
 import json, os
 from datetime import datetime
 from dotenv import load_dotenv
@@ -325,8 +326,8 @@ def ping():
   return "Pong! Version: {}".format(os.environ['VERSION'])
 
 if __name__ == "__main__":
-  for envVariable in ['ADMIN_PASS', 'PASS_EXTENSION', 'SERVER_ACCESS_CODE', 'VERSION', 'DISCORD_WEBHOOK_URL']:
+  for envVariable in ['ADMIN_PASS', 'PASS_EXTENSION', 'SERVER_ACCESS_CODE', 'VERSION', 'DISCORD_WEBHOOK_URL', 'LOGGER_URL', 'LOGS_ACCESS_CODE', 'CLIENT_NAME']:
     if envVariable not in os.environ:
-      print("System boot error: Missing environment variable: " + envVariable)
+      Logger.log("Missing environment variable: " + envVariable, "error")
       exit(1)
   app.run(host='0.0.0.0', port=8000)

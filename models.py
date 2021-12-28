@@ -1,5 +1,6 @@
 import random, uuid, os, datetime, json
 import requests
+from logger import *
 from dotenv import load_dotenv
 load_dotenv()
 
@@ -40,10 +41,10 @@ def sendLoginAlertDiscordWebhookMessage(pwd):
     try:
         result.raise_for_status()
         print()
-        print("Successfully sent login alert to Discord.")
+        Logger.log("Successfully sent login alert to Discord.")
         print()
     except requests.exceptions.HTTPError as err:
-        print("Error sending login alert to Discord webhook: " + err)
+        Logger.log("Error sending login alert to Discord webhook: " + err)
 
 settingsAvailable = ['loginAlertsEnabled', 'authTokenExpirationTime']
 

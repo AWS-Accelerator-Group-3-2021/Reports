@@ -41,10 +41,10 @@ def sendLoginAlertDiscordWebhookMessage(pwd):
     try:
         result.raise_for_status()
         print()
-        Logger.log("Successfully sent login alert to Discord.")
+        print("Successfully sent login alert to Discord.")
         print()
     except requests.exceptions.HTTPError as err:
-        Logger.log("Error sending login alert to Discord webhook: " + err)
+        print("Error sending login alert to Discord webhook: " + err)
 
 settingsAvailable = ['loginAlertsEnabled', 'authTokenExpirationTime']
 

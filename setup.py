@@ -4,8 +4,10 @@ load_dotenv()
 
 print("Starting The Reports System setup procedure...")
 print()
+time.sleep(1)
 print("Checking the system environment...")
 print()
+time.sleep(1.5)
 print("Gathered system information:")
 print()
 def linux_distribution():

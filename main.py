@@ -39,6 +39,34 @@ if not os.path.exists(os.path.join(os.getcwd(), 'reports.txt')):
 
 loadedReports = json.load(open('reports.txt'))
 
+## Analytics data
+analyticsData = {
+  "totalReports": 0,
+  "clearReportsRequests": 0,
+  "deleteReportsRequests": 0,
+  "loginRequests": 0
+}
+
+if not os.path.isfile(os.path.join(os.getcwd(), "analyticsData.txt")):
+  with open(os.path.join(os.getcwd(), "analyticsData.txt"), 'w') as f:
+    json.dump(analyticsData, f)
+
+analyticsData = json.load(open('analyticsData.txt'))
+
+@app.before_request
+def updateAnalyticsData():
+  if request.path.endswith('/passwordCheck'):
+    analyticsData['loginRequests'] += 1
+  elif request.path.endswith('/newReport'):
+    analyticsData['totalReports'] += 1
+  elif request.path.endswith('/clearReports'):
+    analyticsData['clearReportsRequests'] += 1
+  elif request.path.endswith('/deleteReport'):
+    analyticsData['deleteReportsRequests'] += 1
+
+  # Save changes to file
+  json.dump(analyticsData, open('analyticsData.txt', 'w'))
+
 #### EXAMPLE REPORT:
 #### {
 ####   "id": "<UUID STRING>" : {
